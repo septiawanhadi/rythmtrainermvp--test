@@ -1,12 +1,18 @@
 package com.example.rhythmtrainermvp.ui
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,6 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,19 +34,23 @@ import androidx.compose.ui.zIndex
 import com.example.rhythmtrainermvp.viewmodel.RhythmUiState
 import com.example.rhythmtrainermvp.viewmodel.RhythmViewModel
 
+@SuppressLint("NewApi", "MissingPermission")
 @Composable
 fun RhythmScreen(viewModel: RhythmViewModel, onTogglePlay: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val isPreview = LocalInspectionMode.current // Check if we are in Preview mode
 
     RhythmScreenContent(
         uiState = uiState,
         onTogglePlay = onTogglePlay,
         onUserTap = { tapTimeNs ->
-            // Haptic Feedback
-            val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            if (vibrator.hasVibrator()) {
-                vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+            // Haptic Feedback - Only execute if NOT in preview mode
+            if (!isPreview) {
+                val vibrator = context.getSystemService(Vibrator::class.java)
+                if (vibrator != null && vibrator.hasVibrator()) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+                }
             }
             viewModel.onUserTap(tapTimeNs)
         }
@@ -54,22 +65,31 @@ fun RhythmScreenContent(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         
-        // TOP 40%: Canvas Rendering Area
+        // TOP 40%: Canvas Area
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(0.4f)
                 .background(Color(0xFFE0E0E0))
         ) {
-            // Z-Index for Text (Metadata) MUST be highest
+            // Z-Index for Metadata (Score/Feedback)
             Column(
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(16.dp)
-                    .zIndex(1f) // Ensure it is on top
+                    .zIndex(1f)
             ) {
-                Text("Score: ${uiState.score}", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text("Highest Score: ${uiState.highestScore}", fontSize = 16.sp, color = Color.DarkGray)
+                Text(
+                    text = "Score: ${uiState.score}", 
+                    fontSize = 24.sp, 
+                    fontWeight = FontWeight.Bold, 
+                    color = Color.Black
+                )
+                Text(
+                    text = "Highest Score: ${uiState.highestScore}", 
+                    fontSize = 16.sp, 
+                    color = Color.DarkGray
+                )
                 if (uiState.lastFeedback.isNotEmpty()) {
                     Text(
                         text = uiState.lastFeedback, 
@@ -86,21 +106,17 @@ fun RhythmScreenContent(
 
             // Canvas for musical notation
             Canvas(modifier = Modifier.fillMaxSize()) {
-                val canvasWidth = size.width
-                val canvasHeight = size.height
-
-                // Draw simple staff lines (placeholder for MVP visual)
-                val staffY = canvasHeight / 2
+                val staffY = size.height / 2
                 drawLine(
                     color = Color.Black,
                     start = Offset(0f, staffY),
-                    end = Offset(canvasWidth, staffY),
+                    end = Offset(size.width, staffY),
                     strokeWidth = 4f
                 )
             }
         }
 
-        // BOTTOM 60%: Distraction-free "Tap Zone"
+        // BOTTOM 60%: Tap Zone
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -109,8 +125,7 @@ fun RhythmScreenContent(
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = {
-                            val tapTimeNs = System.nanoTime()
-                            onUserTap(tapTimeNs)
+                            onUserTap(System.nanoTime())
                         }
                     )
                 },
@@ -118,7 +133,7 @@ fun RhythmScreenContent(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    "TAP ZONE", 
+                    text = "TAP ZONE", 
                     fontSize = 24.sp, 
                     color = Color.LightGray, 
                     fontWeight = FontWeight.Bold
@@ -132,9 +147,6 @@ fun RhythmScreenContent(
     }
 }
 
-// ==========================================
-// PREVIEW UNTUK ANDROID STUDIO
-// ==========================================
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun RhythmScreenPreview() {
