@@ -1,4 +1,4 @@
-package com.example.rhythmtrainermvp.ui
+package com.example.rhythmtrainermvp.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,11 +16,11 @@ import com.example.rhythmtrainermvp.ui.theme.*
 import com.example.rhythmtrainermvp.viewmodel.GameViewModel
 
 /**
- * GameScreen (RhythmScreen.kt)
- * Implementasi sesuai PRD Section 4.2.
+ * /ui/screens/GameScreen.kt
+ * Implementasi PRD Section 4.2
  */
 @Composable
-fun RhythmScreen(
+fun GameScreen(
     viewModel: GameViewModel = viewModel()
 ) {
     val gameState by viewModel.gameState.collectAsState()
@@ -37,18 +37,20 @@ fun RhythmScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // Display Zone (40%)
+            // TOP 40% — Display Zone (PRD 4.2)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(RhythmDimensions.DisplayZoneHeightFraction)
             ) {
+                // Layer 0: Notation Canvas
                 NotationCanvas(
                     noteEvents = noteEvents,
                     playheadFraction = playheadFraction,
                     modifier = Modifier.fillMaxSize()
                 )
 
+                // Layer 1: Feedback Text
                 lastFeedback?.let { (result, timestamp) ->
                     FeedbackText(
                         result = result,
@@ -59,13 +61,14 @@ fun RhythmScreen(
                     )
                 }
 
+                // Layer 2: Count-In Overlay
                 CountInOverlay(
                     count = countInBeat,
                     modifier = Modifier.fillMaxSize()
                 )
             }
 
-            // Tap Zone (60%)
+            // BOTTOM 60% — Tap Zone (PRD 4.4)
             TapZone(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -74,16 +77,19 @@ fun RhythmScreen(
             )
         }
 
+        // Instruction Overlay
         if (gameState == GameState.IDLE) {
             InstructionOverlay(text = "Tap Anywhere to Start")
         }
 
+        // SUMMARY Overlay (PRD 4.7)
         SummaryOverlay(
             show = gameState == GameState.SUMMARY,
             score = sessionScore,
             onRetry = { viewModel.onRetry() }
         )
 
+        // Settings Icon
         IconButton(
             onClick = { /* Navigate to Credits */ },
             modifier = Modifier

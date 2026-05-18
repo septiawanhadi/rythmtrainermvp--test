@@ -1,33 +1,27 @@
 package com.example.rhythmtrainermvp
 
+import android.content.Context
+import android.media.AudioManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.rhythmtrainermvp.audio.AudioController
-import com.example.rhythmtrainermvp.data.PreferencesManager
 import com.example.rhythmtrainermvp.ui.RhythmScreen
-import com.example.rhythmtrainermvp.viewmodel.RhythmViewModel
-import com.example.rhythmtrainermvp.viewmodel.RhythmViewModelFactory
+import com.example.rhythmtrainermvp.ui.screens.SplashScreen
 
 class MainActivity : ComponentActivity() {
-
-    private lateinit var audioController: AudioController
-    private lateinit var preferencesManager: PreferencesManager
-
-    private val viewModel: RhythmViewModel by viewModels {
-        RhythmViewModelFactory(preferencesManager)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        audioController = AudioController()
-        preferencesManager = PreferencesManager(applicationContext)
+        // Inisialisasi awal NDK Audio Engine
+        initAudioEngine()
 
         setContent {
             MaterialTheme {
@@ -35,38 +29,30 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    RhythmScreen(
-                        viewModel = viewModel,
-                        onTogglePlay = {
-                            viewModel.togglePlay()
-                            if (viewModel.uiState.value.isPlaying) {
-                                audioController.startEngine()
-                            } else {
-                                audioController.stopEngine()
-                            }
-                        }
-                    )
+                    var showSplash by remember { mutableStateOf(true) }
+
+                    if (showSplash) {
+                        SplashScreen(onLoadComplete = { showSplash = false })
+                    } else {
+                        // RhythmScreen di sini bertindak sebagai GameScreen utama
+                        RhythmScreen()
+                    }
                 }
             }
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        if (viewModel.uiState.value.isPlaying) {
-            audioController.stopEngine()
-        }
+    private fun initAudioEngine() {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val sampleRate = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)?.toInt() ?: 48000
+        val framesPerBurst = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER)?.toInt() ?: 128
+        
+        // Inisialisasi engine via JNI Bridge
+        RhythmBridge.nativeInit(sampleRate, framesPerBurst)
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (viewModel.uiState.value.isPlaying) {
-            audioController.startEngine()
-        }
-    }
-    
     override fun onDestroy() {
         super.onDestroy()
-        audioController.stopEngine()
+        RhythmBridge.nativeDestroy()
     }
 }

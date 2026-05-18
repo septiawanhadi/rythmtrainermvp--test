@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.rhythmtrainermvp"
-    compileSdk = 36 // Standardized for better IDE compatibility
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.rhythmtrainermvp"
@@ -17,8 +17,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags += "-std=c++17 -Wall"
-                arguments += "-DANDROID_STL=c++_shared"
+                cppFlags("-std=c++17", "-O2")
+                arguments("-DANDROID_STL=c++_shared")
             }
         }
     }
@@ -50,9 +50,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.oboe)
+    implementation(libs.androidx.datastore.preferences) // Added missing dependency
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -60,14 +58,14 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    
-    // Moved to implementation to ensure Preview finds the adapter
-    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.oboe)
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

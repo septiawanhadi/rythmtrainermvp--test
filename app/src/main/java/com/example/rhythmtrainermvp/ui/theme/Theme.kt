@@ -1,58 +1,34 @@
 package com.example.rhythmtrainermvp.ui.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
+/**
+ * Rhythm Trainer MVP Level 1 Theme
+ * Strictly following PRD Section 1.
+ */
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = RhythmColors.Playhead,
+    secondary = RhythmColors.HitPerfect,
+    tertiary = RhythmColors.HitGood,
+    background = RhythmColors.AppBackground,
+    surface = RhythmColors.SummaryCard,
+    onPrimary = RhythmColors.AppBackground,
+    onSecondary = RhythmColors.AppBackground,
+    onTertiary = RhythmColors.AppBackground,
+    onBackground = RhythmColors.TextPrimary,
+    onSurface = RhythmColors.TextPrimary
 )
 
 @Composable
 fun RhythmTrainerMVPTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
+    // PRD Level 1 is strictly Dark Mode (Section 1.1)
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
+        colorScheme = DarkColorScheme,
+        typography = RhythmTypography,
         content = content
     )
 }
