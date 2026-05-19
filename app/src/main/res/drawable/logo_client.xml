@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder: Client Logo (⏳ PENDING final vector drawable) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="80"
+    android:viewportHeight="80">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M10,10 L70,10 L70,70 L10,70 Z" />
+    <path
+        android:fillColor="#FF121212"
+        android:pathData="M20,20 L60,20 L60,60 L20,60 Z" />
+</vector>

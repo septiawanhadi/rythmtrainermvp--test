@@ -1,5 +1,5 @@
 *.iml
-.gradle
+.gradle/
 /local.properties
 /.idea/caches
 /.idea/libraries
@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Allow WAV file in res/raw only
+!app/src/main/res/raw/metronome_click.wav
+
+# Build output
+app/build/

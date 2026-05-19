@@ -6,29 +6,45 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
-val Typography = Typography(
+/**
+ * Font: Inter (Google Fonts — downloadable font in res/font/)
+ * Fallback: sans-serif system until Inter font files are added.
+ */
+private val InterFamily = FontFamily.SansSerif // TODO: Replace after adding Inter .ttf to res/font/
+
+val RhythmTypography = Typography(
+    // "Tap Anywhere to Start" instruction
+    displayLarge = TextStyle(
+        fontFamily = InterFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp,
+        letterSpacing = 0.5.sp,
+        color = RhythmColors.TextInstruction
+    ),
+    // Count-In digits (1, 2, 3, 4)
+    displayMedium = TextStyle(
+        fontFamily = InterFamily,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 72.sp,
+        color = RhythmColors.TextCountIn
+    ),
+    // Scoring feedback popup text (Perfect / Good / Miss)
+    headlineLarge = TextStyle(
+        fontFamily = InterFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp
+    ),
+    // Summary modal labels
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = InterFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        color = RhythmColors.TextPrimary
     ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+    // Retry button
+    labelLarge = TextStyle(
+        fontFamily = InterFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp
     )
-    */
 )

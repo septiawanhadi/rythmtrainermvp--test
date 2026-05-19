@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.22.1)
-project("rhythmtrainermvp")
+project("rhythmengine")
 
+# Oboe via Prefab (dependency declared in app/build.gradle.kts)
 find_package(oboe REQUIRED CONFIG)
 
-add_library(
-        rhythmtrainermvp
-        SHARED
-        audio_engine.cpp)
+add_library(rhythmengine SHARED
+    RhythmEngine.cpp
+    MetronomePlayer.cpp
+    jni_bridge.cpp
+)
 
-target_link_libraries(
-        rhythmtrainermvp
-        oboe::oboe
-        log)
+target_link_libraries(rhythmengine
+    oboe::oboe
+    android
+    log
+)

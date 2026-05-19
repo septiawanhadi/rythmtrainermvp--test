@@ -3,70 +3,40 @@ package com.example.rhythmtrainermvp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.rhythmtrainermvp.audio.AudioController
-import com.example.rhythmtrainermvp.data.PreferencesManager
-import com.example.rhythmtrainermvp.ui.RhythmScreen
-import com.example.rhythmtrainermvp.viewmodel.RhythmViewModel
-import com.example.rhythmtrainermvp.viewmodel.RhythmViewModelFactory
+import androidx.compose.ui.graphics.Color
+import com.example.rhythmtrainermvp.ui.theme.RhythmColors
 
 class MainActivity : ComponentActivity() {
-
-    private lateinit var audioController: AudioController
-    private lateinit var preferencesManager: PreferencesManager
-
-    private val viewModel: RhythmViewModel by viewModels {
-        RhythmViewModelFactory(preferencesManager)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        audioController = AudioController()
-        preferencesManager = PreferencesManager(applicationContext)
+
+        // Phase 1: Initialize audio engine (no-op stub)
+        // Phase 2: Wire actual sampleRate + framesPerBurst from AudioManager
+        RhythmBridge.nativeInit(44100, 192)
 
         setContent {
-            MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    RhythmScreen(
-                        viewModel = viewModel,
-                        onTogglePlay = {
-                            viewModel.togglePlay()
-                            if (viewModel.uiState.value.isPlaying) {
-                                audioController.startEngine()
-                            } else {
-                                audioController.stopEngine()
-                            }
-                        }
-                    )
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(RhythmColors.AppBackground),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "Rhythm Trainer MVP",
+                    color = Color.White
+                )
             }
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        if (viewModel.uiState.value.isPlaying) {
-            audioController.stopEngine()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (viewModel.uiState.value.isPlaying) {
-            audioController.startEngine()
-        }
-    }
-    
     override fun onDestroy() {
         super.onDestroy()
-        audioController.stopEngine()
+        RhythmBridge.nativeDestroy()
     }
 }

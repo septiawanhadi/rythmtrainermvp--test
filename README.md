@@ -1,4 +1,0 @@
-﻿# rythmtrainermvp--test env and infra version
-
--- Bukan versi real loh ya, ini versi persiapan nya sajah --
-
